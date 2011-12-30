@@ -104,7 +104,7 @@ class MainLayout:
       if ch == curses.KEY_RESIZE:
         (self._screenMaxY, self._screenMaxX) = self._stdscr.getmaxyx()
         self._mainpanel.feedResize()
-      elif ch == 127: # backspace
+      elif ch in [8, 127, curses.KEY_BACKSPACE]: # backspace
         self._tmpmessage = None
         self._cmdline = self._cmdline[0:len(self._cmdline)-1]
       elif ch == 27: # escape
