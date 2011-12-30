@@ -50,8 +50,12 @@ def _ET_fromStr(str):
     return ET.String
   elif str == 'size':
     return ET.Size
-  elif str == 'attachment':
+  elif str in ['attachment', 'att']:
     return ET.Attachment
+  elif str == 'var':
+    return ET.Var
+  elif str == 'type': 
+    return ET.Type
   else:
     return None
 ET.fromStr = _ET_fromStr
