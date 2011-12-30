@@ -26,6 +26,7 @@ import email
 import mailbox
 import re
 import os
+import sys
 
 # application modules
 import emailextra
@@ -371,9 +372,12 @@ class Engine:
   def setStatusInterface(self, statusInterface):
     self._statusInterface = statusInterface
 
+  def setMailbox(self, mboxName):
+    self._mboxName = mboxName
+
   def startup(self):
     self._statusInterface.setTopStatusText('MailMan version 0.1')
-    self._mailbox = mailbox.mbox("testdata/Inbox")
+    self._mailbox = mailbox.mbox(self._mboxName)
     self._query = ExprNull(ET.Bool, dict(), dict())
     for (indent, text, obj) in self._query.uiGetRendering():
       self._mainPanel.addLine('  '*indent+text, obj)
@@ -721,7 +725,18 @@ class Engine:
     self.updateStatus()
     return ret
 
+
+global errorMsg
+errorMsg = None
+
 def main(stdscr, *args, **kwds):
+  if (len(sys.argv) != 2):
+    global errorMsg
+    errorMsg = "Usage: moss <mailbox/maildir path>"
+    return
+
+  mboxName = sys.argv[1]
+
   mainLayout = MainLayout(stdscr)
   mainPanel = MainPanel(stdscr)
 
@@ -733,8 +748,11 @@ def main(stdscr, *args, **kwds):
   engine.setMainPanel(mainPanel)
   engine.setStatusInterface(mainLayout)
   engine.setMainLayout(mainLayout)
+  engine.setMailbox(mboxName)
 
   mainLayout.run()
 
 curses.wrapper( main )
+if errorMsg != None:
+  print errorMsg
 
