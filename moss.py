@@ -377,7 +377,10 @@ class Engine:
 
   def startup(self):
     self._statusInterface.setTopStatusText('MailMan version 0.1')
-    self._mailbox = mailbox.mbox(self._mboxName)
+    if os.path.isdir(self._mboxName):
+      self._mailbox = mailbox.Maildir(self._mboxName, None)
+    else:
+      self._mailbox = mailbox.mbox(self._mboxName)
     self._query = ExprNull(ET.Bool, dict(), dict())
     for (indent, text, obj) in self._query.uiGetRendering():
       self._mainPanel.addLine('  '*indent+text, obj)
