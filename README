@@ -1,6 +1,70 @@
 moss - MailbOx Search Script
 ----------------------------
 
-Moss is a tool for searching mailboxes. It is still in experimental stage, use at your own risk.
+Moss is a tool for searching mailboxes. It is still in experimental stage,
+use at your own risk.
 
 Moss is distributed under GPL v3.
+
+Prerequisites
+-------------
+
+Moss requires mutt (an mail user agent) to run:
+
+  www.mutt.org
+
+For example, on Ubuntu:
+
+  apt-get install mutt
+
+Usage
+-----
+
+I am aware that the following is insufficient. I will enhance one day.
+
+Run the program as follows:
+
+  moss <path-to-mailbox>
+
+where <path-to-mailbox> may be a single-file mbox or a Maildir.
+
+In the program, you can move the selection up and down with 'k' and 'j' keys
+(vim style). With 'K' and 'J' you can scroll without moving the selection.
+To enter a command, just type (no command starts with any of 'kjKJ', so there
+is no clash with the movement keys).
+
+In Moss, you first build a query, which is an expression returning true/false
+for any given email message. The query is presented in the form of a tree
+which you can build interactively.
+
+Commands:
+  null - create a 'NULL' subexpression (a placeholder),
+  substring - create a substring expression (finds one string inside
+              another)
+  and - create a logical 'and' expression or add a sibling to an expression
+        inside an 'and'
+  or - create a logical 'or' expression or add a sibling to an expression
+       inside an 'or'
+  forall [<type>] - create a universal quantifier over a variable of the
+                    type given ('string'/'int'/'att'; 'att' means attachment),
+                    default type is 'string'
+  exists [<type>] - create an existential quantifier over a variable of the
+                    type given ('string'/'int'/'att'; 'att' means attachment)
+                    default type is 'string'
+  const - creates a constant
+  var - creates a variable
+  header - creates an expression evaluating to the value of the given email
+           header
+  att - creates an expression evaluating to the list of all attachments of
+        the email (except the attachments of mime types 'text/*'),
+  attsize - creates an expression evaluating to the size of the attachment
+            given as argument (returns 0 for multipart),
+  gt - creates a 'greater' comparison expression on int arguments
+  more - add a sibling to a list of expressions (in and/or and quantifiers),
+  mod - change the parameter value (for elements that have parameters),
+  search - search using the current query,
+  show - show search results (this creates a temporary mailbox and opens
+         with mutt),
+  quit - exit the application.
+
+Besides, hitting <return> on an element which has a parameter works as 'mod'.
