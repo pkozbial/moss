@@ -312,7 +312,7 @@ def _ExprConst_uiGetRendering(self):
   if self._etype == ET.String:
     l = [(0, '"'+self._value+'"', self)]
   elif self._etype == ET.Int:
-    l = [(0, 'TODO: Const Int rendering', self)]
+    l = [(0, str(self._value), self)]
   elif self._etype == ET.Size:
     l = [(0, 'TODO: Const Size rendering', self)]
   elif self._etype == ET.Bool:
@@ -433,3 +433,69 @@ ExprAllAttachments.uiGetCmdName = _ExprAllAttachments_uiGetCmdName
 def _ExprAllAttachments_uiCanReplaceWoWarning():
   return False
 ExprAllAttachments.uiCanReplaceWoWarning = _ExprAllAttachments_uiCanReplaceWoWarning
+
+### class ExprAttSize
+
+def _ExprAttSize_uiGetRendering(self):
+  l = [(0, 'ATTACHMENT SIZE', self)]
+  for (indent, text, obj) in self._child.uiGetRendering():
+    l.append((1+indent, text, obj))
+  return l
+ExprAttSize.uiGetRendering = _ExprAttSize_uiGetRendering
+  
+def _ExprAttSize__uiGetIndentForChild(self, child):
+  raise BaseException("Not my child")
+ExprAttSize._uiGetIndentForChild = _ExprAttSize__uiGetIndentForChild
+
+def _ExprAttSize_uiPosHintCreate(self):
+  return self
+ExprAttSize.uiPosHintCreate = _ExprAttSize_uiPosHintCreate
+
+def _ExprAttSize_uiPosHintRemove(self):
+  return self._parent
+ExprAttSize.uiPosHintRemove = _ExprAttSize_uiPosHintRemove
+
+@staticmethod
+def _ExprAttSize_uiGetCmdName():
+  return 'attsize'
+ExprAttSize.uiGetCmdName = _ExprAttSize_uiGetCmdName
+
+@staticmethod
+def _ExprAttSize_uiCanReplaceWoWarning():
+  return False
+ExprAttSize.uiCanReplaceWoWarning = _ExprAttSize_uiCanReplaceWoWarning
+
+### class ExprGt
+
+def _ExprGt_uiGetRendering(self):
+  l = [(0, '>', self)]
+  for (indent, text, obj) in self._left.uiGetRendering():
+    l.append((1+indent, text, obj))
+  for (indent, text, obj) in self._right.uiGetRendering():
+    l.append((1+indent, text, obj))
+  return l
+ExprGt.uiGetRendering = _ExprGt_uiGetRendering
+  
+def _ExprGt__uiGetIndentForChild(self, child):
+  if child is self._left or child is self._right:
+    return 1
+  raise BaseException("Not my child")
+ExprGt._uiGetIndentForChild = _ExprGt__uiGetIndentForChild
+
+def _ExprGt_uiPosHintCreate(self):
+  return self
+ExprGt.uiPosHintCreate = _ExprGt_uiPosHintCreate
+
+def _ExprGt_uiPosHintRemove(self):
+  return self._parent
+ExprGt.uiPosHintRemove = _ExprGt_uiPosHintRemove
+
+@staticmethod
+def _ExprGt_uiGetCmdName():
+  return 'gt'
+ExprGt.uiGetCmdName = _ExprGt_uiGetCmdName
+
+@staticmethod
+def _ExprGt_uiCanReplaceWoWarning():
+  return False
+ExprGt.uiCanReplaceWoWarning = _ExprGt_uiCanReplaceWoWarning

@@ -459,7 +459,12 @@ class ExprConst(Expr):
     if 'value' in params:
       self._value = params['value']
     else:
-      self._value = ""
+      if self._etype == ET.String:
+        self._value = ""
+      elif self._etype == ET.Int:
+        self._value = 0
+      else:
+        raise BaseException("Internal error")
 
   def copyWithEnv(self, env, parent):
     expr = ExprConst(self._etype, self._constParams, dict())
@@ -489,57 +494,6 @@ class ExprConst(Expr):
       d['value'] = ET.String
     elif etype == ET.Size:
       d['value'] = ET.Size
-    return d
-
-  def removeChild(self, child):
-    raise BaseException("Not my child")
-
-  def replaceChild(self, child, expr):
-    raise BaseException("Not my child")
-
-  def getFlatTree(self):
-    return [self]
-
-class ExprConst(Expr):
-
-  def __init__(self, etype, constParams, params):
-    Expr.__init__(self, etype, constParams, params)
-    self._etype = etype
-    if 'value' in params:
-      self._value = params['value']
-    else:
-      self._value = ""
-
-  def copyWithEnv(self, env, parent):
-    expr = ExprConst(self._etype, self._constParams, dict())
-    expr.setParent(parent)
-    expr._value = self._value
-    return expr
- 
-  def setParam(self, name, value):
-    if name == 'value':
-      self._value = value
-    else:
-      raise BaseException("Invalid parameter")
-
-  @staticmethod
-  def getPossibleTypes():
-    return set((ET.Int, ET.String, ET.Size, ET.Bool))
-
-  def getType(self):
-    return self._etype
-
-  @staticmethod
-  def getParamTypes(etype, constParams):
-    d = dict()
-    if etype == ET.Int:
-      d['value'] = ET.Int
-    elif etype == ET.String:
-      d['value'] = ET.String
-    elif etype == ET.Size:
-      d['value'] = ET.Size
-    elif etype == ET.Bool:
-      d['value'] = ET.Bool
     return d
 
   def removeChild(self, child):
@@ -677,3 +631,94 @@ class ExprAllAttachments(Expr):
 
   def getFlatTree(self):
     return [self]
+
+class ExprAttSize(Expr):
+
+  def __init__(self, etype, constParams, params):
+    Expr.__init__(self, etype, constParams, params)
+    self._child = ExprNull(ET.Attachment, dict(), dict())
+    self._child.setParent(self)
+
+  def copyWithEnv(self, env, parent):
+    expr = ExprAttSize(self._etype, self._constParams, dict())
+    expr.setParent(parent)
+    expr._child = self._child.copyWithEnv(env, expr)
+    return expr
+
+  @staticmethod
+  def getPossibleTypes():
+    return set((ET.Int,))
+
+  def getType(self):
+    return ET.Int
+
+  def removeChild(self, child):
+    if child is self._child:
+      self._child = ExprNull(ET.String)
+      self._child.setParent(self)
+      self._child.setParent(self)
+    else:
+      raise BaseException("Not my child")
+
+  def replaceChild(self, child, expr):
+    if child is self._child:
+      self._child = expr
+      self._child.setParent(self)
+    else:
+      raise BaseException("Not my child")
+
+  def getFlatTree(self):
+    l = [self]
+    l.extend(self._child.getFlatTree())
+    return l
+
+class ExprGt(Expr):
+
+  def __init__(self, etype, constParams, params):
+    Expr.__init__(self, etype, constParams, params)
+    self._left = ExprNull(ET.Int, dict(), dict())
+    self._left.setParent(self)
+    self._right = ExprNull(ET.Int, dict(), dict())
+    self._right.setParent(self)
+
+  def copyWithEnv(self, env, parent):
+    expr = ExprAttSize(self._etype, self._constParams, dict())
+    expr.setParent(parent)
+    expr._left = self._left.copyWithEnv(env, expr)
+    expr._right = self._right.copyWithEnv(env, expr)
+    return expr
+
+  @staticmethod
+  def getPossibleTypes():
+    return set((ET.Bool,))
+
+  def getType(self):
+    return ET.Bool
+
+  def removeChild(self, child):
+    if child is self._left:
+      self._left= ExprNull(ET.String)
+      self._left.setParent(self)
+      self._left.setParent(self)
+    elif child is self._right:
+      self._right= ExprNull(ET.String)
+      self._right.setParent(self)
+      self._right.setParent(self)
+    else:
+      raise BaseException("Not my child")
+
+  def replaceChild(self, child, expr):
+    if child is self._left:
+      self._left = expr
+      self._left.setParent(self)
+    elif child is self._right:
+      self._right = expr
+      self._right.setParent(self)
+    else:
+      raise BaseException("Not my child")
+
+  def getFlatTree(self):
+    l = [self]
+    l.extend(self._left.getFlatTree())
+    l.extend(self._right.getFlatTree())
+    return l

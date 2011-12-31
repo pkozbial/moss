@@ -183,3 +183,29 @@ def _ExprAllAttachments_evaluate(self, message, tenv, venv):
   else:
     return []
 ExprAllAttachments.evaluate = _ExprAllAttachments_evaluate
+
+### class ExprAttSize
+
+def _ExprAttSize_isComplete(self):
+  return self._child.isComplete()
+ExprAttSize.isComplete = _ExprAttSize_isComplete
+
+def _ExprAttSize_evaluate(self, message, tenv, venv):
+  att = self._child.evaluate(message, tenv, venv)
+  if att.is_multipart():
+    return 0
+  else:
+    return len(att.get_payload(decode=False))
+ExprAttSize.evaluate = _ExprAttSize_evaluate
+
+### class ExprGt
+
+def _ExprGt_isComplete(self):
+  return self._left.isComplete() and self._right.isComplete()
+ExprGt.isComplete = _ExprGt_isComplete
+
+def _ExprGt_evaluate(self, message, tenv, venv):
+  l = self._left.evaluate(message, tenv, venv)
+  r = self._right.evaluate(message, tenv, venv)
+  return l > r
+ExprGt.evaluate = _ExprGt_evaluate

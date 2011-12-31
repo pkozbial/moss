@@ -412,7 +412,7 @@ class Engine:
     raise BaseException("Internal error")
 
   def valueFromString(self, ptype, arg):
-    if ptype == ET.Int: raise BaseException("To be implemented")
+    if ptype == ET.Int: return int(arg)
     if ptype == ET.String: return arg
     if ptype == ET.Size: raise BaseException("To be implemented")
     if ptype == ET.Bool:
@@ -447,7 +447,7 @@ class Engine:
           return FeedCmdResult.error('incorrect value >'+arg+'< for type '+ET.toStr(ptype))
       constParams[pname] = pvalue
     else:
-      raise BasicException("NOT IMPLEMENTED: multiple constant parameters")
+      raise BaseException("NOT IMPLEMENTED: multiple constant parameters")
     return exprClass(etype, constParams, dict())
 
   def standardCreateCommand(self, cmd, arg, current, currentLine):
