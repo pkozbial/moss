@@ -70,6 +70,9 @@ class Expr(object):
   def getType(self):
     raise BaseException("Abstract class")
 
+  def isTypeList(self):
+    return False
+
   # Will return False if it is not possible to remove.
   # RETURN: True or False
   def remove(self):
@@ -497,6 +500,57 @@ class ExprConst(Expr):
   def getFlatTree(self):
     return [self]
 
+class ExprConst(Expr):
+
+  def __init__(self, etype, constParams, params):
+    Expr.__init__(self, etype, constParams, params)
+    self._etype = etype
+    if 'value' in params:
+      self._value = params['value']
+    else:
+      self._value = ""
+
+  def copyWithEnv(self, env, parent):
+    expr = ExprConst(self._etype, self._constParams, dict())
+    expr.setParent(parent)
+    expr._value = self._value
+    return expr
+ 
+  def setParam(self, name, value):
+    if name == 'value':
+      self._value = value
+    else:
+      raise BaseException("Invalid parameter")
+
+  @staticmethod
+  def getPossibleTypes():
+    return set((ET.Int, ET.String, ET.Size, ET.Bool))
+
+  def getType(self):
+    return self._etype
+
+  @staticmethod
+  def getParamTypes(etype, constParams):
+    d = dict()
+    if etype == ET.Int:
+      d['value'] = ET.Int
+    elif etype == ET.String:
+      d['value'] = ET.String
+    elif etype == ET.Size:
+      d['value'] = ET.Size
+    elif etype == ET.Bool:
+      d['value'] = ET.Bool
+    return d
+
+  def removeChild(self, child):
+    raise BaseException("Not my child")
+
+  def replaceChild(self, child, expr):
+    raise BaseException("Not my child")
+
+  def getFlatTree(self):
+    return [self]
+
 class ExprVar(Expr):
 
   def __init__(self, etype, constParams, params):
@@ -577,6 +631,43 @@ class ExprCustomHeader(Expr):
     d = dict()
     d['name'] = ET.String
     return d
+
+  def removeChild(self, child):
+    raise BaseException("Not my child")
+
+  def replaceChild(self, child, expr):
+    raise BaseException("Not my child")
+
+  def getFlatTree(self):
+    return [self]
+
+
+class ExprAllAttachments(Expr):
+
+  def __init__(self, etype, constParams, params):
+    Expr.__init__(self, etype, constParams, params)
+
+  def copyWithEnv(self, env, parent):
+    expr = ExprAllAttachments(self._etype, self._constParams, dict())
+    expr.setParent(parent)
+    return expr
+
+  def setParam(self, name, value):
+    raise BaseException("Invalid parameter")
+
+  @staticmethod
+  def getPossibleTypes():
+    return set((ET.Attachment,))
+
+  def getType(self):
+    return ET.Attachment
+
+  def isTypeList(self):
+    return True
+
+  @staticmethod
+  def getParamTypes(self, constParams):
+    return dict()
 
   def removeChild(self, child):
     raise BaseException("Not my child")

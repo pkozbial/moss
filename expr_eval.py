@@ -19,6 +19,7 @@
 # along with Moss.  If not, see <http://www.gnu.org/licenses/>.
 
 import mailbox
+import re
 
 from expr import *
 import emailextra
@@ -115,11 +116,21 @@ def _ExprExists_isComplete(self):
 ExprExists.isComplete = _ExprExists_isComplete
 
 def _ExprExists_evaluate(self, message, tenv, venv):
+  vs = []
   for value in self._values:
     tenv1 = tenv
     venv1 = venv
+    vOrVs = value.evaluate(message, tenv, venv)
+    if value.isTypeList():
+      for v in vOrVs:
+        vs.append(v)
+    else:
+      vs.append(vOrVs)
+  for value in vs:
+    tenv1 = tenv
+    venv1 = venv
     tenv1[self._varName] = self._varType
-    venv1[self._varName] = value.evaluate(message, tenv, venv)
+    venv1[self._varName] = value 
     res = self._expr.evaluate(message, tenv1, venv1)
     if res == True:
       return True
@@ -155,3 +166,20 @@ ExprCustomHeader.isComplete = _ExprCustomHeader_isComplete
 def _ExprCustomHeader_evaluate(self, message, tenv, venv):
   return emailextra.headerToUnicode(message, self._name)
 ExprCustomHeader.evaluate = _ExprCustomHeader_evaluate
+
+### class ExprAllAttachments
+
+def _ExprAllAttachments_isComplete(self):
+  return True
+ExprAllAttachments.isComplete = _ExprAllAttachments_isComplete
+
+def _ExprAllAttachments_evaluate(self, message, tenv, venv):
+  if message.is_multipart():
+    ret = []
+    for part in message.get_payload():
+      if not re.search(r'^text/', part.get_content_type()):
+        ret.append(part)
+    return ret
+  else:
+    return []
+ExprAllAttachments.evaluate = _ExprAllAttachments_evaluate

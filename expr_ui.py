@@ -316,7 +316,10 @@ def _ExprConst_uiGetRendering(self):
   elif self._etype == ET.Size:
     l = [(0, 'TODO: Const Size rendering', self)]
   elif self._etype == ET.Bool:
-    l = [(0, 'TODO: Const Size rendering', self)]
+    if self._value == True:
+      l = [(0, 'TRUE', self)]
+    else:
+      l = [(0, 'FALSE', self)]
   else:
     l = [(0, 'ERROR: unknown type in Const', self)]
   return l
@@ -402,3 +405,31 @@ ExprCustomHeader.uiGetCmdName = _ExprCustomHeader_uiGetCmdName
 def _ExprCustomHeader_uiCanReplaceWoWarning():
   return False
 ExprCustomHeader.uiCanReplaceWoWarning = _ExprCustomHeader_uiCanReplaceWoWarning
+
+### class ExprAllAttachments
+
+def _ExprAllAttachments_uiGetRendering(self):
+  return [(0, 'ALL ATTACHMENTS', self)]
+ExprAllAttachments.uiGetRendering = _ExprAllAttachments_uiGetRendering
+  
+def _ExprAllAttachments__uiGetIndentForChild(self, child):
+  raise BaseException("Not my child")
+ExprAllAttachments._uiGetIndentForChild = _ExprAllAttachments__uiGetIndentForChild
+
+def _ExprAllAttachments_uiPosHintCreate(self):
+  return self
+ExprAllAttachments.uiPosHintCreate = _ExprAllAttachments_uiPosHintCreate
+
+def _ExprAllAttachments_uiPosHintRemove(self):
+  return self._parent
+ExprAllAttachments.uiPosHintRemove = _ExprAllAttachments_uiPosHintRemove
+
+@staticmethod
+def _ExprAllAttachments_uiGetCmdName():
+  return 'att'
+ExprAllAttachments.uiGetCmdName = _ExprAllAttachments_uiGetCmdName
+
+@staticmethod
+def _ExprAllAttachments_uiCanReplaceWoWarning():
+  return False
+ExprAllAttachments.uiCanReplaceWoWarning = _ExprAllAttachments_uiCanReplaceWoWarning

@@ -406,6 +406,7 @@ class Engine:
     if ptype == ET.Int: return 0
     if ptype == ET.String: return ''
     if ptype == ET.Size: return None
+    if ptype == ET.Bool: return True
     if ptype == ET.Var: return '_'
     if ptype == ET.Type: return ET.String
     raise BaseException("Internal error")
@@ -414,6 +415,13 @@ class Engine:
     if ptype == ET.Int: raise BaseException("To be implemented")
     if ptype == ET.String: return arg
     if ptype == ET.Size: raise BaseException("To be implemented")
+    if ptype == ET.Bool:
+      if arg == 'true':
+        return True
+      elif arg == 'false':
+        return False
+      else:
+        raise BaseException("Invalid boolean constant")
     if ptype == ET.Var: return arg
     if ptype == ET.Type:
        return ET.fromStr(arg)
